@@ -1,13 +1,14 @@
 from queue import LifoQueue
+from collections import deque
 
 class FreqStack:
 
     def __init__(self):
-        self.s = LifoQueue()
+        self.s = deque()
 
 
     def push(self, val: int) -> None:
-        self.s.put(val)
+        self.s.append(val)
 
 
     def pop(self) -> int:
@@ -29,23 +30,26 @@ class FreqStack:
                     tmp.put(tmp2.get())
                 tmp.put((val, 1))
 
-        s2 = LifoQueue()
-        while not self.s.empty():
-            val = self.s.get()
+        s2 = deque()
+        while len(self.s):
+            val = self.s.popleft()
             search_add(val)
-            s2.put(val)
-        while not s2.empty():
-            self.s.put(s2.get())
-        most_freq = tmp.get()[0]
-        while not self.s.empty():
-            val = self.s.get()
+            s2.appendleft(val)
+        while len(s2):
+            self.s.appendleft(s2.popleft())
+        most_freq = tmp.get()
+        while not tmp.empty():
+            val = tmp.get()
+            if val[1] > most_freq[1]:
+                most_freq = val
+        most_freq = most_freq[0]
+        while len(self.s):
+            val = self.s.pop()
             if val == most_freq:
                 break
-            s2.put(val)
-        while not self.s.empty():
-            s2.put(self.s.get())
-        while not s2.empty():
-            self.s.put(s2.get())
+            s2.append(val)
+        while len(s2):
+            self.s.append(s2.pop())
         return most_freq
 
 
@@ -53,6 +57,12 @@ class FreqStack:
 # obj = FreqStack()
 # obj.push(val)
 # param_2 = obj.pop()
+
+# freqStack = FreqStack()
+# freqStack.push(5) # The stack is [5]
+# freqStack.push(7) # The stack is [5,7]
+# freqStack.push(4) # The stack is [5,7,5,7,4]
+# print(freqStack.pop())   # return 5, as 5 is the most frequent. The stack becomes [5,7,5,7,4].
 
 freqStack = FreqStack()
 freqStack.push(5) # The stack is [5]
