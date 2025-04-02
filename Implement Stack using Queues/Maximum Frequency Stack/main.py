@@ -27,7 +27,7 @@ class FreqStack:
             else:
                 while not tmp2.empty():
                     tmp.put(tmp2.get())
-                    tmp.put((val, 1))
+                tmp.put((val, 1))
 
         s2 = LifoQueue()
         while not self.s.empty():
@@ -36,7 +36,17 @@ class FreqStack:
             s2.put(val)
         while not s2.empty():
             self.s.put(s2.get())
-        return tmp.get()[0]
+        most_freq = tmp.get()[0]
+        while not self.s.empty():
+            val = self.s.get()
+            if val == most_freq:
+                break
+            s2.put(val)
+        while not self.s.empty():
+            s2.put(self.s.get())
+        while not s2.empty():
+            self.s.put(s2.get())
+        return most_freq
 
 
 # Your FreqStack object will be instantiated and called as such:
@@ -44,7 +54,7 @@ class FreqStack:
 # obj.push(val)
 # param_2 = obj.pop()
 
-freqStack = FreqStack();
+freqStack = FreqStack()
 freqStack.push(5) # The stack is [5]
 freqStack.push(7) # The stack is [5,7]
 freqStack.push(5) # The stack is [5,7,5]
