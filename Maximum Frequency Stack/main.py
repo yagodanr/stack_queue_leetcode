@@ -1,56 +1,34 @@
-from queue import LifoQueue
 from collections import deque
 
 class FreqStack:
 
     def __init__(self):
         self.s = deque()
+        self.freq = {}
+        self.most_freq = 0
 
 
     def push(self, val: int) -> None:
         self.s.append(val)
+        if val not in self.freq:
+            self.freq[val] = 0
+        self.freq[val] += 1
+        self.most_freq = max(self.most_freq, self.freq[val])
 
 
     def pop(self) -> int:
-        tmp = LifoQueue()
-        tmp2 = LifoQueue()
-
-        def search_add(val):
-            nonlocal tmp, tmp2
-            while not tmp.empty():
-                top = tmp.get()
-                if top[0] == val:
-                    while not tmp2.empty():
-                        tmp.put(tmp2.get())
-                    tmp.put((val, top[1]+1))
-                    break
-                tmp2.put(top)
-            else:
-                while not tmp2.empty():
-                    tmp.put(tmp2.get())
-                tmp.put((val, 1))
-
-        s2 = deque()
+        s1 = deque()
+        el = None
         while len(self.s):
-            val = self.s.popleft()
-            search_add(val)
-            s2.appendleft(val)
-        while len(s2):
-            self.s.appendleft(s2.popleft())
-        most_freq = tmp.get()
-        while not tmp.empty():
-            val = tmp.get()
-            if val[1] > most_freq[1]:
-                most_freq = val
-        most_freq = most_freq[0]
-        while len(self.s):
-            val = self.s.pop()
-            if val == most_freq:
+            el = self.s.pop()
+            if self.freq[el] == self.most_freq:
+                while len(s1):
+                    self.s.append(s1.pop())
+                self.freq[el] -= 1
+                self.most_freq = max(self.freq.values())
                 break
-            s2.append(val)
-        while len(s2):
-            self.s.append(s2.pop())
-        return most_freq
+            s1.append(el)
+        return el
 
 
 # Your FreqStack object will be instantiated and called as such:
